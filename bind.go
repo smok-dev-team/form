@@ -1,34 +1,13 @@
-package main
+package form
 
 import (
-	"fmt"
 	"reflect"
 	"strconv"
-//	"pi/plugin/mongodb"
-//	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 )
 
-type Human struct {
-	Person
-	Id     bson.ObjectId `bson:"_id"`
-	Name   string  `   bson:"name"`
-	Age    int     `bson:"age"`
+func Bind(obj interface{}, form map[string][]string) (err error) {
+	return mapForm(obj, form)
 }
-
-type Person struct {
-	PName string `form:"p"`
-}
-
-func main() {
-	var h Human
-
-	mapForm(&h, map[string][]string{"Name": []string{"adfad"}, "Age": []string{"1234"}, "p": []string{"aaaa"}})
-
-	fmt.Println("=====")
-	fmt.Println(h.Name, h.Age, h.PName)
-}
-
 
 func mapForm(obj interface{}, form map[string][]string) (err error) {
 	var objValue = reflect.ValueOf(obj)
