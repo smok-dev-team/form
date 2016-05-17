@@ -3,6 +3,7 @@ package form
 import (
 	"fmt"
 	"testing"
+	"net/http"
 )
 
 type Human struct {
@@ -51,4 +52,13 @@ func TestCleanData(t *testing.T) {
 	var p People
 	Bind(&p, formData)
 	fmt.Println(p.Name, p.Age, p.CleanData)
+}
+
+func TestRequest(t *testing.T) {
+	http.HandleFunc("/", func(writer http.ResponseWriter, req *http.Request) {
+		var p People
+		BindWithRequest(req, &p)
+		writer.Write([]byte(fmt.Sprintf("name: %s  age: %d", p.Name, p.Age)))
+	})
+	http.ListenAndServe(":8000", nil)
 }

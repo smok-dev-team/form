@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"strconv"
 	"errors"
+	"net/http"
+	"strings"
 )
 
 const (
@@ -11,6 +13,21 @@ const (
 	K_FORM_NO_TAG     = "-"
 	K_FORM_CLEAN_DATA = "CleanData"
 )
+
+func BindWithRequest(request *http.Request, result interface{}) (err error) {
+	err = request.ParseForm()
+	if err != nil {
+		return err
+	}
+
+	var contentType = request.Header.Get("Content-Type")
+	if strings.Contains(contentType, "multipart/form-data") {
+		request.ParseMultipartForm(32 << 20)
+	}
+
+	err = Bind(result, request.Form)
+	return err
+}
 
 // var err = Bind(&result, data)
 func Bind(result interface{}, form map[string][]string) (err error) {
