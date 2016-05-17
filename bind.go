@@ -3,15 +3,22 @@ package form
 import (
 	"reflect"
 	"strconv"
-	"fmt"
+	"errors"
 )
 
-func Bind(obj interface{}, form map[string][]string) (err error) {
-	fmt.Println("in")
-	var objValue = reflect.ValueOf(obj)
-	var objType = reflect.TypeOf(obj)
-
+// var err = Bind(&result, data)
+func Bind(result interface{}, form map[string][]string) (err error) {
+	var objValue = reflect.ValueOf(result)
+	var objType = reflect.TypeOf(result)
 	var objValueKind = objValue.Kind()
+
+	if objValueKind == reflect.Struct {
+		return errors.New("obj is struct")
+	}
+	if objValue.IsNil() {
+		return errors.New("obj is nil")
+	}
+
 	for {
 		if objValueKind == reflect.Ptr && objValue.IsNil() {
 			objValue.Set(reflect.New(objType.Elem()))

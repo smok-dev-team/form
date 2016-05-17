@@ -6,24 +6,35 @@ import (
 )
 
 type Human struct {
-	*Person
-	CleanData map[string]interface{}
-	Name string `bson:"name" form:"name"`
-	Age  int    `bson:"age"`
-
-	P *Person
+	Name string `form:"name"`
+	Age  int    `form:"age"`
 }
 
-type Person struct {
-	PName string `form:"p"`
+type Class struct {
+	ClassName string `form:"class_name"`
 }
 
-func TestBind(t *testing.T) {
-	var h *Human //= &Human{}
+type Student struct {
+	Human
+	Number int `form:"number"`
+	Class  Class
+}
 
-	Bind(&h, map[string][]string{"name": []string{"adfad"}, "Age": []string{"1234"}, "p": []string{"aaaa"}})
+var formData = map[string][]string{"name": []string{"Yangfeng"}, "age": []string{"12"}, "number": []string{"9"}, "class_name":[]string{"class one"}}
 
-	fmt.Println("=====")
-	fmt.Println(h.Name, h.Age, h.PName, h.P.PName)
-	fmt.Println(h.CleanData)
+func TestBindPoint(t *testing.T) {
+	fmt.Println("===== bind pointer =====")
+	var s *Student
+	Bind(&s, formData)
+
+	if s != nil {
+		fmt.Println(s.Name, s.Age, s.Number, s.Class.ClassName)
+	}
+}
+
+func TestBindStruct(t *testing.T) {
+	fmt.Println("===== bind struct =====")
+	var s Student
+	Bind(&s, formData)
+	fmt.Println(s.Name, s.Age, s.Number, s.Class.ClassName)
 }
