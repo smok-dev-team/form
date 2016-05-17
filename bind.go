@@ -6,6 +6,10 @@ import (
 	"errors"
 )
 
+const (
+	K_FORM_NO_TAG = "-"
+)
+
 // var err = Bind(&result, data)
 func Bind(result interface{}, form map[string][]string) (err error) {
 	var objValue = reflect.ValueOf(result)
@@ -69,7 +73,7 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form 
 				}
 				continue
 			}
-		} else if tag == "-" {
+		} else if tag == K_FORM_NO_TAG {
 			continue
 		}
 
