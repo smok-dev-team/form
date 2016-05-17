@@ -13,7 +13,7 @@ func Bind(obj interface{}, form map[string][]string) (err error) {
 	objType = objType.Elem()
 
 	var cleanDataValue = objValue.FieldByName("CleanData")
-	if cleanDataValue.IsValid() {
+	if cleanDataValue.IsValid() && cleanDataValue.IsNil() {
 		cleanDataValue.Set(reflect.MakeMap(cleanDataValue.Type()))
 	}
 	return mapForm(objType, objValue, cleanDataValue, form)
@@ -25,7 +25,6 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form 
 		var fieldType = objType.Field(i)
 		var fieldValue = objValue.Field(i)
 
-
 		if !fieldValue.CanSet() {
 			continue
 		}
@@ -34,6 +33,13 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form 
 
 		if tag == "" {
 			tag = fieldType.Name
+
+			if fieldValue.Kind() == reflect.Ptr {
+				if fieldValue.IsNil() {
+					fieldValue.Set(reflect.New(fieldValue.Type().Elem()))
+				}
+				fieldValue = fieldValue.Elem()
+			}
 
 			if fieldValue.Kind() == reflect.Struct {
 				err = mapForm(fieldValue.Addr().Type().Elem(), fieldValue, cleanDataValue, form)
