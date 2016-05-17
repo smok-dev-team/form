@@ -7,7 +7,9 @@ import (
 )
 
 const (
-	K_FORM_NO_TAG = "-"
+	K_FORM_TAG        = "form"
+	K_FORM_NO_TAG     = "-"
+	K_FORM_CLEAN_DATA = "CleanData"
 )
 
 // var err = Bind(&result, data)
@@ -37,7 +39,7 @@ func Bind(result interface{}, form map[string][]string) (err error) {
 		break
 	}
 
-	var cleanDataValue = objValue.FieldByName("CleanData")
+	var cleanDataValue = objValue.FieldByName(K_FORM_CLEAN_DATA)
 	if cleanDataValue.IsValid() && cleanDataValue.IsNil() {
 		cleanDataValue.Set(reflect.MakeMap(cleanDataValue.Type()))
 	}
@@ -54,7 +56,7 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form 
 			continue
 		}
 
-		var tag = fieldType.Tag.Get("form")
+		var tag = fieldType.Tag.Get(K_FORM_TAG)
 
 		if tag == "" {
 			tag = fieldType.Name
