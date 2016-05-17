@@ -8,7 +8,7 @@ import (
 type Human struct {
 	Person
 	CleanData map[string]interface{}
-	Name string `bson:"name"`
+	Name string `bson:"name" form:"name"`
 	Age  int    `bson:"age"`
 }
 
@@ -20,9 +20,8 @@ func TestBind(t *testing.T) {
 	var h Human
 	h.CleanData = make(map[string]interface{})
 
-	Bind(&h, map[string][]string{"Name": []string{"adfad"}, "Age": []string{"1234"}, "p": []string{"aaaa"}})
+	Bind(&h, map[string][]string{"name": []string{"adfad"}, "Age": []string{"1234"}, "p": []string{"aaaa"}})
 
 	fmt.Println("=====")
-	fmt.Println(h.Name, h.Age, h.PName)
 	fmt.Println(h.CleanData)
 }

@@ -6,20 +6,23 @@ import (
 )
 
 func Bind(obj interface{}, form map[string][]string) (err error) {
-	return mapForm(obj, form)
-}
-
-func mapForm(obj interface{}, form map[string][]string) (err error) {
 	var objValue = reflect.ValueOf(obj)
 	var objType = reflect.TypeOf(obj)
 
 	objValue = objValue.Elem()
 	objType = objType.Elem()
 
+	var cleanDataValue = objValue.FieldByName("CleanData")
+	cleanDataValue.Set(reflect.MakeMap(cleanDataValue.Type()))
+	return mapForm(objType, objValue, cleanDataValue, form)
+}
+
+func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form map[string][]string) (err error) {
 	var numField = objType.NumField()
 	for i:=0; i< numField; i++ {
 		var fieldType = objType.Field(i)
 		var fieldValue = objValue.Field(i)
+
 
 		if !fieldValue.CanSet() {
 			continue
@@ -31,7 +34,7 @@ func mapForm(obj interface{}, form map[string][]string) (err error) {
 			tag = fieldType.Name
 
 			if fieldValue.Kind() == reflect.Struct {
-				err = mapForm(fieldValue.Addr().Interface(), form)
+				err = mapForm(fieldValue.Addr().Type().Elem(), fieldValue, cleanDataValue, form)
 				if err != nil {
 					return err
 				}
@@ -50,6 +53,7 @@ func mapForm(obj interface{}, form map[string][]string) (err error) {
 		if err != nil {
 			return err
 		}
+		cleanDataValue.SetMapIndex(reflect.ValueOf(tag), fieldValue)
 	}
 	return err
 }
