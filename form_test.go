@@ -19,9 +19,9 @@ type Person struct {
 }
 
 func TestBind(t *testing.T) {
-	var h *Human = &Human{}
+	var h *Human //= &Human{}
 
-	Bind(h, map[string][]string{"name": []string{"adfad"}, "Age": []string{"1234"}, "p": []string{"aaaa"}})
+	Bind(&h, map[string][]string{"name": []string{"adfad"}, "Age": []string{"1234"}, "p": []string{"aaaa"}})
 
 	fmt.Println("=====")
 	fmt.Println(h.Name, h.Age, h.PName, h.P.PName)

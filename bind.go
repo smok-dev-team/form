@@ -3,14 +3,28 @@ package form
 import (
 	"reflect"
 	"strconv"
+	"fmt"
 )
 
 func Bind(obj interface{}, form map[string][]string) (err error) {
+	fmt.Println("in")
 	var objValue = reflect.ValueOf(obj)
 	var objType = reflect.TypeOf(obj)
 
-	objValue = objValue.Elem()
-	objType = objType.Elem()
+	var objValueKind = objValue.Kind()
+	for {
+		if objValueKind == reflect.Ptr && objValue.IsNil() {
+			objValue.Set(reflect.New(objType.Elem()))
+		}
+
+		if objValueKind == reflect.Ptr {
+			objValue = objValue.Elem()
+			objType = objType.Elem()
+			objValueKind = objValue.Kind()
+			continue
+		}
+		break
+	}
 
 	var cleanDataValue = objValue.FieldByName("CleanData")
 	if cleanDataValue.IsValid() && cleanDataValue.IsNil() {
