@@ -41,7 +41,7 @@ func TestBindStruct(t *testing.T) {
 }
 
 type People struct {
-	CleanData map[string]interface{}
+	Form
 	Name      string  `form:"name"`
 	Age       int     `form:"age"`
 	Undefined string  `form:"undefined"` // 表单中没有的字段，其不会出现在 CleanData 中
