@@ -66,17 +66,17 @@ func Bind(result interface{}, form map[string][]string) (err error) {
 func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form map[string][]string) (err error) {
 	var numField = objType.NumField()
 	for i:=0; i< numField; i++ {
-		var fieldType = objType.Field(i)
+		var fieldStruct = objType.Field(i)
 		var fieldValue = objValue.Field(i)
 
 		if !fieldValue.CanSet() {
 			continue
 		}
 
-		var tag = fieldType.Tag.Get(K_FORM_TAG)
+		var tag = fieldStruct.Tag.Get(K_FORM_TAG)
 
 		if tag == "" {
-			tag = fieldType.Name
+			tag = fieldStruct.Name
 
 			if fieldValue.Kind() == reflect.Ptr {
 				if fieldValue.IsNil() {
@@ -101,7 +101,7 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form 
 			continue
 		}
 
-		err = setValueForField(fieldType.Type.Kind(), values[0], fieldValue)
+		err = setValueForField(fieldStruct.Type.Kind(), values[0], fieldValue)
 		if err != nil {
 			return err
 		}
