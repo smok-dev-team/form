@@ -101,9 +101,22 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form 
 			continue
 		}
 
-		err = setValueForField(fieldStruct.Type.Kind(), values[0], fieldValue)
-		if err != nil {
-			return err
+		var valueLen = len(values)
+		if fieldValue.Kind() == reflect.Slice && valueLen > 0 {
+			var sKind = fieldValue.Type().Elem().Kind()
+			var s = reflect.MakeSlice(fieldStruct.Type, valueLen, valueLen)
+			for i:=0; i<valueLen; i++ {
+				err = setValueForField(sKind, values[i], s.Index(i))
+				if err != nil {
+					return err
+				}
+			}
+			objValue.Field(i).Set(s)
+		} else {
+			err = setValueForField(fieldStruct.Type.Kind(), values[0], fieldValue)
+			if err != nil {
+				return err
+			}
 		}
 		if cleanDataValue.IsValid() {
 			cleanDataValue.SetMapIndex(reflect.ValueOf(tag), fieldValue)
@@ -143,7 +156,6 @@ func setValueForField(fieldTypeKind reflect.Kind, v string, fieldValue reflect.V
 	case reflect.String:
 		fieldValue.SetString(v)
 	}
-
 	return nil
 }
 
