@@ -63,7 +63,7 @@ func Bind(result interface{}, form map[string][]string) (err error) {
 	return mapForm(objType, objValue, cleanDataValue, form)
 }
 
-func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form map[string][]string) (err error) {
+func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form map[string][]string) (error) {
 	var numField = objType.NumField()
 	for i:=0; i< numField; i++ {
 		var fieldStruct = objType.Field(i)
@@ -86,8 +86,7 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form 
 			}
 
 			if fieldValue.Kind() == reflect.Struct {
-				err = mapForm(fieldValue.Addr().Type().Elem(), fieldValue, cleanDataValue, form)
-				if err != nil {
+				if err := mapForm(fieldValue.Addr().Type().Elem(), fieldValue, cleanDataValue, form); err != nil {
 					return err
 				}
 				continue
@@ -106,15 +105,13 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form 
 			var sKind = fieldValue.Type().Elem().Kind()
 			var s = reflect.MakeSlice(fieldStruct.Type, valueLen, valueLen)
 			for i:=0; i<valueLen; i++ {
-				err = setValueForField(sKind, values[i], s.Index(i))
-				if err != nil {
+				if err := setValueForField(sKind, values[i], s.Index(i)); err != nil {
 					return err
 				}
 			}
 			objValue.Field(i).Set(s)
 		} else {
-			err = setValueForField(fieldStruct.Type.Kind(), values[0], fieldValue)
-			if err != nil {
+			if err := setValueForField(fieldStruct.Type.Kind(), values[0], fieldValue); err != nil {
 				return err
 			}
 		}
@@ -122,7 +119,7 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form 
 			cleanDataValue.SetMapIndex(reflect.ValueOf(tag), fieldValue)
 		}
 	}
-	return err
+	return nil
 }
 
 func setValueForField(fieldTypeKind reflect.Kind, v string, fieldValue reflect.Value) (error) {
