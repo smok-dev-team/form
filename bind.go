@@ -101,8 +101,8 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form 
 			continue
 		}
 
-		var valueLen = len(values)
-		if fieldValue.Kind() == reflect.Slice && valueLen > 0 {
+		if fieldValue.Kind() == reflect.Slice {
+			var valueLen = len(values)
 			var sKind = fieldValue.Type().Elem().Kind()
 			var s = reflect.MakeSlice(fieldStruct.Type, valueLen, valueLen)
 			for i:=0; i<valueLen; i++ {
