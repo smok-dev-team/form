@@ -1,25 +1,84 @@
 package form
 
 import (
-	"reflect"
 	"fmt"
+	"reflect"
 )
 
 const (
 	K_VALIDATOR_FUNC_SUFFIX = "Validator"
 )
 
+////////////////////////////////////////////////////////////////////////////////
 type ValidatorError struct {
-	Field   string
-	Code    int
-	Message string
+	Code    int       `json:"code"`
+	Message string    `json:"message"`
+}
+
+func NewValidatorError(code int, msg string) (*ValidatorError) {
+	var err = &ValidatorError{}
+	err.Code = code
+	err.Message = msg
+	return err
 }
 
 func (this *ValidatorError) Error() string {
-	return fmt.Sprintf("[%s]%d:%s", this.Field, this.Code, this.Message)
+	return fmt.Sprintf("[%d]%s", this.Code, this.Message)
 }
 
-func Validate(obj interface{}) (err []error) {
+////////////////////////////////////////////////////////////////////////////////
+type IValidator interface {
+	ErrorList()                      []error
+	ErrorMap()                       map[string][]error
+	ErrorListWithField(field string) []error
+	Error()                          error
+	OK()                             bool
+}
+
+////////////////////////////////////////////////////////////////////////////////
+type validator struct {
+	errorMap  map[string][]error  `json:"error_map"`
+	errorList []error             `json:"-"`
+	fieldList []string            `json:"-"`
+}
+
+func (this *validator) String() string {
+	return fmt.Sprintf("[validator]: Valid:%t, Error:%s", this.OK(), this.errorMap)
+}
+
+func (this *validator) ErrorList() []error {
+	if this.errorList == nil {
+		if len(this.errorMap) > 0 {
+			this.errorList = make([]error, 0, len(this.fieldList))
+			for _, field := range this.fieldList {
+				this.errorList = append(this.errorList, this.errorMap[field]...)
+			}
+		}
+	}
+	return this.errorList
+}
+
+func (this *validator) ErrorMap() map[string][]error {
+	return this.errorMap
+}
+
+func (this *validator) ErrorListWithField(field string) []error {
+	return this.errorMap[field]
+}
+
+func (this *validator) Error() error {
+	if len(this.ErrorList()) > 0 {
+		return this.ErrorList()[0]
+	}
+	return nil
+}
+
+func (this *validator) OK() bool {
+	return (len(this.errorMap) == 0)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+func Validate(obj interface{}) (IValidator) {
 	var objType = reflect.TypeOf(obj)
 	var objValue = reflect.ValueOf(obj)
 
@@ -36,20 +95,17 @@ func Validate(obj interface{}) (err []error) {
 		return nil
 	}
 
-	var errMap = make(map[string][]error)
-	validate(objType, objValue, errMap)
 
-	var errList []error
-	if len(errMap) > 0 {
-		errList = make([]error, 0, 0)
-		for _, value := range errMap {
-			errList = append(errList, value...)
-		}
-	}
-	return errList
+	var val = &validator{}
+	val.errorMap = make(map[string][]error)
+	val.fieldList = make([]string, 0, objType.NumField())
+
+	validate(objType, objValue, val)
+
+	return val
 }
 
-func validate(objType reflect.Type, objValue reflect.Value, errMap map[string][]error) {
+func validate(objType reflect.Type, objValue reflect.Value, val *validator) {
 	var numField = objType.NumField()
 	for i:=0; i<numField; i++ {
 		var fieldStruct = objType.Field(i)
@@ -60,7 +116,7 @@ func validate(objType reflect.Type, objValue reflect.Value, errMap map[string][]
 		}
 
 		if fieldValue.Kind() == reflect.Struct {
-			validate(fieldValue.Type(), fieldValue, errMap)
+			validate(fieldValue.Type(), fieldValue, val)
 			continue
 		}
 
@@ -70,10 +126,11 @@ func validate(objType reflect.Type, objValue reflect.Value, errMap map[string][]
 			var eList = mValue.Call([]reflect.Value{fieldValue})
 
 			if !eList[0].IsNil() {
+				val.fieldList = append(val.fieldList, fieldStruct.Name)
 				if eList[0].Kind() == reflect.Slice {
-					errMap[fieldStruct.Name] = eList[0].Interface().([]error)
+					val.errorMap[fieldStruct.Name] = eList[0].Interface().([]error)
 				} else {
-					errMap[fieldStruct.Name] = []error{eList[0].Interface().(error)}
+					val.errorMap[fieldStruct.Name] = []error{eList[0].Interface().(error)}
 				}
 			}
 		}

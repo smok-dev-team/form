@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 	//"net/http"
-	"errors"
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14,7 +13,7 @@ type Human struct {
 }
 
 func (this Human) NameValidator(n string) []error {
-	return []error{errors.New("Name 字段错误1."), errors.New("Name 字段错误2.")}
+	return []error{NewValidatorError(1001, "Name 字段错误1."), NewValidatorError(1002, "Name 字段错误2.")}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,9 +21,9 @@ type Class struct {
 	ClassName string `form:"class_name"`
 }
 
-func (this Class) ClassNameValidator(n string) error {
-	return errors.New("ClassName 字段错误.")
-}
+//func (this Class) ClassNameValidator(n string) error {
+//	return NewValidatorError(1004, "ClassName 字段错误.")
+//}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 type Student struct {
@@ -33,9 +32,9 @@ type Student struct {
 	Class  Class
 }
 
-func (this Student) NumberValidator(n int) error {
-	return errors.New("Number 字段错误.")
-}
+//func (this Student) NumberValidator(n int) error {
+//	return NewValidatorError(1003, "Number 字段错误.")
+//}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 var formData = map[string][]string{"name": []string{"Yangfeng"}, "age": []string{"12"}, "number": []string{"9"}, "class_name":[]string{"class one"}}
@@ -45,7 +44,7 @@ func TestBindPoint(t *testing.T) {
 	var s *Student
 	Bind(&s, formData)
 
-	fmt.Println("数据验证错误:", Validate(s))
+	fmt.Println("数据验证错误:", Validate(s).Error())
 
 	if s != nil {
 		fmt.Println(s.Name, s.Age, s.Number, s.Class.ClassName)
@@ -55,11 +54,11 @@ func TestBindPoint(t *testing.T) {
 func TestBindStruct(t *testing.T) {
 	fmt.Println("===== bind struct =====")
 	var s Student
-	//Bind(&s, formData)
+	Bind(&s, formData)
 
-	fmt.Println("数据验证错误:", Validate(s))
+	fmt.Println("数据验证错误:", Validate(s).OK())
 
-	//fmt.Println(s.Name, s.Age, s.Number, s.Class.ClassName)
+	fmt.Println(s.Name, s.Age, s.Number, s.Class.ClassName)
 }
 
 type People struct {
