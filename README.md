@@ -16,6 +16,7 @@ type Human struct {
 }
 
 type Student struct {
+	Human
 	Number int `form:"number"`
 }
 
