@@ -9,9 +9,10 @@ import (
 )
 
 const (
-	K_FORM_TAG        = "form"
-	K_FORM_NO_TAG     = "-"
-	K_FORM_CLEAN_DATA = "CleanData"
+	K_FORM_TAG                 = "form"
+	K_FORM_NO_TAG              = "-"
+	K_FORM_CLEAN_DATA          = "CleanData"
+	K_FORM_DEFAULT_FUNC_SUFFIX = "Default"
 )
 
 func BindWithRequest(request *http.Request, result interface{}) (err error) {
@@ -97,6 +98,21 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form 
 
 		var values, exists = form[tag]
 		if !exists {
+			var mName = fieldStruct.Name + K_FORM_DEFAULT_FUNC_SUFFIX
+			var mValue = fieldValue.MethodByName(mName)
+			if mValue.IsValid() == false {
+				if objValue.CanAddr() {
+					mValue = objValue.Addr().MethodByName(mName)
+				}
+			}
+
+			if mValue.IsValid() {
+				var rList = mValue.Call(nil)
+				if cleanDataValue.IsValid() {
+					cleanDataValue.SetMapIndex(reflect.ValueOf(tag), rList[0])
+				}
+				fieldValue.Set(rList[0])
+			}
 			continue
 		}
 

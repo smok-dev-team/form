@@ -24,7 +24,7 @@ var formData = map[string][]string{"name": []string{"Yangfeng"}, "age": []string
 
 // 绑定
 var s *Student
-var err = form.Bind(&s, formData)
+var err = form.Bind(formData, &s)
 if err != nil {
 	fmt.Println("绑定失败")
 }
@@ -57,3 +57,16 @@ Bind(...)
 h.CleanData 包含 name 和 Age 两个key。前提是绑定的数据源也包含这两个字段。
 
 ```
+
+#### 默认值
+为结构体添加添加 属性名+Default 的方法名，并且返回和该属性相同类型的数据，即可为该属性添加默认值。
+
+例如：
+
+```
+func (this Human) AgeDefault() int {
+	return 18
+}
+```
+
+如上所示，如果绑定的数据源中没有找到 Age 相关的字段，则会将 Age 属性的值初始化为 AgeDefault 方法返回的值。
