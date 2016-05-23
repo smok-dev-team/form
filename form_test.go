@@ -30,7 +30,7 @@ var formData = map[string][]string{"name": []string{"Yangfeng"}, "age": []string
 func TestBindPoint(t *testing.T) {
 	fmt.Println("===== bind pointer =====")
 	var s *Student
-	Bind(&s, formData)
+	Bind(formData, &s)
 
 	if s != nil {
 		fmt.Println(s.Name, s.Age, s.Number, s.Class.ClassName)
@@ -40,7 +40,7 @@ func TestBindPoint(t *testing.T) {
 func TestBindStruct(t *testing.T) {
 	fmt.Println("===== bind struct =====")
 	var s Student
-	Bind(&s, formData)
+	Bind(formData, &s)
 
 	fmt.Println(s.Name, s.Age, s.Number, s.Class.ClassName)
 }
@@ -55,7 +55,7 @@ type People struct {
 func TestCleanData(t *testing.T) {
 	fmt.Println("===== bind with clean data =====")
 	var p People
-	Bind(&p, formData)
+	Bind(formData, &p)
 	fmt.Println(p.Name, p.Age, p.CleanData)
 }
 

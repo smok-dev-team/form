@@ -25,12 +25,12 @@ func BindWithRequest(request *http.Request, result interface{}) (err error) {
 		request.ParseMultipartForm(32 << 20)
 	}
 
-	err = Bind(result, request.Form)
+	err = Bind(request.Form, result)
 	return err
 }
 
 // var err = Bind(&result, data)
-func Bind(result interface{}, form map[string][]string) (err error) {
+func Bind(form map[string][]string, result interface{}) (err error) {
 	var objValue = reflect.ValueOf(result)
 	var objType = reflect.TypeOf(result)
 	var objValueKind = objValue.Kind()
