@@ -31,7 +31,7 @@ func BindWithRequest(request *http.Request, result interface{}) (err error) {
 }
 
 // var err = Bind(&result, data)
-func Bind(form map[string][]string, result interface{}) (err error) {
+func Bind(source map[string][]string, result interface{}) (err error) {
 	var objValue = reflect.ValueOf(result)
 	var objType = reflect.TypeOf(result)
 	var objValueKind = objValue.Kind()
@@ -61,10 +61,10 @@ func Bind(form map[string][]string, result interface{}) (err error) {
 	if cleanDataValue.IsValid() && cleanDataValue.IsNil() {
 		cleanDataValue.Set(reflect.MakeMap(cleanDataValue.Type()))
 	}
-	return mapForm(objType, objValue, cleanDataValue, form)
+	return mapForm(objType, objValue, cleanDataValue, source)
 }
 
-func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form map[string][]string) error {
+func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, source map[string][]string) error {
 	var numField = objType.NumField()
 	for i := 0; i < numField; i++ {
 		var fieldStruct = objType.Field(i)
@@ -87,7 +87,7 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form 
 			}
 
 			if fieldValue.Kind() == reflect.Struct {
-				if err := mapForm(fieldValue.Addr().Type().Elem(), fieldValue, cleanDataValue, form); err != nil {
+				if err := mapForm(fieldValue.Addr().Type().Elem(), fieldValue, cleanDataValue, source); err != nil {
 					return err
 				}
 				continue
@@ -96,7 +96,7 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form 
 			continue
 		}
 
-		var values, exists = form[tag]
+		var values, exists = source[tag]
 		if !exists {
 			var mName = fieldStruct.Name + k_FORM_DEFAULT_FUNC_SUFFIX
 			var mValue = fieldValue.MethodByName(mName)
