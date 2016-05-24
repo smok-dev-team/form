@@ -1,18 +1,18 @@
 package form
 
 import (
-	"reflect"
-	"strconv"
 	"errors"
 	"net/http"
+	"reflect"
+	"strconv"
 	"strings"
 )
 
 const (
-	K_FORM_TAG                 = "form"
-	K_FORM_NO_TAG              = "-"
-	K_FORM_CLEAN_DATA          = "CleanData"
-	K_FORM_DEFAULT_FUNC_SUFFIX = "Default"
+	k_FORM_TAG                 = "form"
+	k_FORM_NO_TAG              = "-"
+	k_FORM_CLEAN_DATA          = "CleanData"
+	k_FORM_DEFAULT_FUNC_SUFFIX = "Default"
 )
 
 func BindWithRequest(request *http.Request, result interface{}) (err error) {
@@ -57,16 +57,16 @@ func Bind(form map[string][]string, result interface{}) (err error) {
 		break
 	}
 
-	var cleanDataValue = objValue.FieldByName(K_FORM_CLEAN_DATA)
+	var cleanDataValue = objValue.FieldByName(k_FORM_CLEAN_DATA)
 	if cleanDataValue.IsValid() && cleanDataValue.IsNil() {
 		cleanDataValue.Set(reflect.MakeMap(cleanDataValue.Type()))
 	}
 	return mapForm(objType, objValue, cleanDataValue, form)
 }
 
-func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form map[string][]string) (error) {
+func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form map[string][]string) error {
 	var numField = objType.NumField()
-	for i:=0; i< numField; i++ {
+	for i := 0; i < numField; i++ {
 		var fieldStruct = objType.Field(i)
 		var fieldValue = objValue.Field(i)
 
@@ -74,7 +74,7 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form 
 			continue
 		}
 
-		var tag = fieldStruct.Tag.Get(K_FORM_TAG)
+		var tag = fieldStruct.Tag.Get(k_FORM_TAG)
 
 		if tag == "" {
 			tag = fieldStruct.Name
@@ -92,13 +92,13 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form 
 				}
 				continue
 			}
-		} else if tag == K_FORM_NO_TAG {
+		} else if tag == k_FORM_NO_TAG {
 			continue
 		}
 
 		var values, exists = form[tag]
 		if !exists {
-			var mName = fieldStruct.Name + K_FORM_DEFAULT_FUNC_SUFFIX
+			var mName = fieldStruct.Name + k_FORM_DEFAULT_FUNC_SUFFIX
 			var mValue = fieldValue.MethodByName(mName)
 			if mValue.IsValid() == false {
 				if objValue.CanAddr() {
@@ -120,7 +120,7 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form 
 			var valueLen = len(values)
 			var sKind = fieldValue.Type().Elem().Kind()
 			var s = reflect.MakeSlice(fieldStruct.Type, valueLen, valueLen)
-			for i:=0; i<valueLen; i++ {
+			for i := 0; i < valueLen; i++ {
 				if err := setValueForField(sKind, values[i], s.Index(i)); err != nil {
 					return err
 				}
@@ -138,7 +138,7 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, form 
 	return nil
 }
 
-func setValueForField(fieldTypeKind reflect.Kind, v string, fieldValue reflect.Value) (error) {
+func setValueForField(fieldTypeKind reflect.Kind, v string, fieldValue reflect.Value) error {
 	switch fieldTypeKind {
 	case reflect.Int:
 		return setIntField(v, 0, fieldValue)
@@ -172,7 +172,7 @@ func setValueForField(fieldTypeKind reflect.Kind, v string, fieldValue reflect.V
 	return nil
 }
 
-func setIntField(v string, bitSize int, vf reflect.Value) (error) {
+func setIntField(v string, bitSize int, vf reflect.Value) error {
 	if v == "" {
 		v = "0"
 	}
@@ -183,7 +183,7 @@ func setIntField(v string, bitSize int, vf reflect.Value) (error) {
 	return err
 }
 
-func setUintField(v string, bitSize int, vf reflect.Value) (error) {
+func setUintField(v string, bitSize int, vf reflect.Value) error {
 	if v == "" {
 		v = "0"
 	}
@@ -194,7 +194,7 @@ func setUintField(v string, bitSize int, vf reflect.Value) (error) {
 	return err
 }
 
-func setBoolField(v string, bitSize int, vf reflect.Value) (error) {
+func setBoolField(v string, bitSize int, vf reflect.Value) error {
 	if v == "" {
 		v = "false"
 	}
@@ -205,7 +205,7 @@ func setBoolField(v string, bitSize int, vf reflect.Value) (error) {
 	return err
 }
 
-func setFloatField(v string, bitSize int, vf reflect.Value) (error) {
+func setFloatField(v string, bitSize int, vf reflect.Value) error {
 	if v == "" {
 		v = "0.0"
 	}
