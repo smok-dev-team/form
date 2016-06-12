@@ -11,8 +11,8 @@ import (
 const (
 	k_FORM_TAG                 = "form"
 	k_FORM_NO_TAG              = "-"
-	k_FORM_CLEAN_DATA          = "CleanData"
-	k_FORM_DEFAULT_FUNC_SUFFIX = "Default"
+	k_FORM_CLEANED_DATA        = "CleanedData"
+	k_FORM_DEFAULT_FUNC_PREFIX = "Default"
 )
 
 func BindWithRequest(request *http.Request, result interface{}) (err error) {
@@ -57,7 +57,7 @@ func Bind(source map[string][]string, result interface{}) (err error) {
 		break
 	}
 
-	var cleanDataValue = objValue.FieldByName(k_FORM_CLEAN_DATA)
+	var cleanDataValue = objValue.FieldByName(k_FORM_CLEANED_DATA)
 	if cleanDataValue.IsValid() && cleanDataValue.IsNil() {
 		cleanDataValue.Set(reflect.MakeMap(cleanDataValue.Type()))
 	}
@@ -98,7 +98,7 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, sourc
 
 		var values, exists = source[tag]
 		if !exists {
-			var mName = fieldStruct.Name + k_FORM_DEFAULT_FUNC_SUFFIX
+			var mName = k_FORM_DEFAULT_FUNC_PREFIX + fieldStruct.Name
 			var mValue = objValue.MethodByName(mName)
 			if mValue.IsValid() == false {
 				if objValue.CanAddr() {

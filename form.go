@@ -1,5 +1,5 @@
 package form
 
 type Form struct {
-	CleanData map[string]interface{}
+	CleanedData map[string]interface{}
 }

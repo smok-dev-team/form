@@ -54,7 +54,7 @@ type People struct {
 }
 
 // 可以为属性添加一个提供默认值的方法
-func (this People) GenderDefault() int {
+func (this People) DefaultGender() int {
 	return 1
 }
 
@@ -62,7 +62,7 @@ func TestCleanData(t *testing.T) {
 	fmt.Println("===== bind with clean data =====")
 	var p People
 	Bind(formData, &p)
-	fmt.Println(p.Name, p.Age, p.Gender, p.CleanData)
+	fmt.Println(p.Name, p.Age, p.Gender, p.CleanedData)
 }
 
 func TestRequest(t *testing.T) {
