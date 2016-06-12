@@ -99,7 +99,7 @@ func mapForm(objType reflect.Type, objValue, cleanDataValue reflect.Value, sourc
 		var values, exists = source[tag]
 		if !exists {
 			var mName = fieldStruct.Name + k_FORM_DEFAULT_FUNC_SUFFIX
-			var mValue = fieldValue.MethodByName(mName)
+			var mValue = objValue.MethodByName(mName)
 			if mValue.IsValid() == false {
 				if objValue.CanAddr() {
 					mValue = objValue.Addr().MethodByName(mName)
