@@ -2,8 +2,8 @@ package form
 
 import (
 	"fmt"
-	"testing"
 	"net/http"
+	"testing"
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@ type Student struct {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-var formData = map[string][]string{"name": []string{"Yangfeng"}, "age":[]string{"120"}, "number": []string{"9"}, "class_name":[]string{"class one"}}
+var formData = map[string][]string{"name": []string{"Yangfeng"}, "age": []string{"120"}, "number": []string{"9"}, "class_name": []string{"class one"}}
 
 func TestBindPoint(t *testing.T) {
 	fmt.Println("===== bind pointer =====")
@@ -47,10 +47,10 @@ func TestBindStruct(t *testing.T) {
 
 type People struct {
 	Form
-	Name      string  `form:"name"`
-	Age       int     `form:"age"`
+	Name      string `form:"name"`
+	Age       int    `form:"age"`
 	Gender    int
-	Undefined string  `form:"undefined"` // 表单中没有的字段，其不会出现在 CleanData 中
+	Undefined string `form:"undefined"` // 表单中没有的字段，其不会出现在 CleanData 中
 }
 
 // 可以为属性添加一个提供默认值的方法
