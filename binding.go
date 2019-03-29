@@ -1,13 +1,15 @@
 package form
 
 import (
+	"github.com/smartwalle/binding"
 	"net/http"
 	"strings"
-	"github.com/smartwalle/binding"
 )
+
 //
 const (
-	k_FORM_TAG                 = "form"
+	kFormTag = "form"
+
 //	k_FORM_NO_TAG              = "-"
 //	k_FORM_CLEANED_DATA        = "CleanedData"
 //	k_FORM_DEFAULT_FUNC_PREFIX = "Default"
@@ -28,7 +30,7 @@ func BindWithRequest(request *http.Request, result interface{}) (err error) {
 	return err
 }
 
-func Bind(values map[string][]string, result interface{}) (err error) {
+func Bind(values map[string][]string, dest interface{}) (err error) {
 	var source = make(map[string]interface{})
 	for key, value := range values {
 		if len(value) > 1 {
@@ -37,8 +39,9 @@ func Bind(values map[string][]string, result interface{}) (err error) {
 			source[key] = value[0]
 		}
 	}
-	return binding.BindWithTag(source, result, k_FORM_TAG)
+	return binding.BindWithTag(source, dest, kFormTag)
 }
+
 //
 //func BindWithRequest(request *http.Request, result interface{}) (err error) {
 //	err = request.ParseForm()
@@ -99,7 +102,7 @@ func Bind(values map[string][]string, result interface{}) (err error) {
 //			continue
 //		}
 //
-//		var tag = fieldStruct.Tag.Get(k_FORM_TAG)
+//		var tag = fieldStruct.Tag.Get(kFormTag)
 //
 //		if tag == "" {
 //			tag = fieldStruct.Name
