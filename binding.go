@@ -1,7 +1,7 @@
 package form
 
 import (
-	"github.com/smartwalle/binding"
+	"github.com/smok-dev-team/binding"
 	"net/http"
 	"strings"
 )
